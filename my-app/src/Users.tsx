@@ -1,91 +1,101 @@
-import { AddCircle } from "@mui/icons-material";
-import { EditNote } from "@mui/icons-material";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import UserForm from './UserForm';
+import { User } from './types';
+import './App.css';
 
-const Users: React.FC = () => {
-  const navigate = useNavigate();
-  const [users, setUsers] = useState<any[]>([]);
-  const [searchUser, setSearchUser] = useState("");
+export default function Users() {
 
-  const handleAddUser = () => {
-    navigate("/add-user");
+  const [users, setUsers] = useState<User[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+
+  const handleAddUser = (newUserData: Omit<User, 'id'>) => {
+    if (editingUser) {
+      // Update existing user
+      setUsers(users.map(user => 
+        user.id === editingUser.id ? { ...newUserData, id: editingUser.id } : user
+      ));
+      setEditingUser(null);
+    } else {
+      // Add new user
+      const newUser = {
+        id: Date.now(),
+        ...newUserData
+      };
+      setUsers([...users, newUser]);
+    }
+    setShowForm(false);
   };
-  
-  const handleEditUser = (index : number)=>{
-    navigate(`/edit-user/${index}`);
-  }
-  
-  useEffect(() => {
-    const storedUsers = JSON.parse(localStorage.getItem("users") || "[]");
-    setUsers(storedUsers);
-  }, []); 
 
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchUser(e.target.value);
+  const handleEdit = (user: User) => {
+    setEditingUser(user);
+    setShowForm(true);
   };
-
-  
-
-
-  const filteredUsers = users.filter(user =>
-    user.email.toLowerCase().includes(searchUser.toLowerCase())
-  );
 
   return (
-    <div>
-      <div className="User-container">
-        <h1 style={{ color: "green"  }}>Manage Users</h1>
-        <input
-          type="email"
-          placeholder="Search for Email"
-          value={searchUser}
-          onChange={handleSearch}
+    <div className="app-container">
+      <h1 className="app-title">Manage Users</h1>
+      
+      {showForm ? (
+        <UserForm 
+          onSubmit={handleAddUser}
+          onCancel={() => {
+            setShowForm(false);
+            setEditingUser(null);
+          }}
+          initialData={editingUser || undefined}
         />
-        <button className="add-btn" onClick={handleAddUser}>
-          <AddCircle /> Add
-        </button>
-     
-
-        <div className="user-list">
-        {filteredUsers.length === 0 ? (
-          <p>No users found</p>
-        ) : (
-          <table className="user-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Role</th>
-                <th>Department</th>
-                <th>Location</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map((user, index) => (
-                <tr key={index}>
-                  <td>{user.firstName} {user.lastName}</td>
-                  <td>{user.email}</td>
-                  <td>{user.phone}</td>
-                  <td>{user.role}</td>
-                  <td>{user.department}</td>
-                  <td>{user.location}</td>
-                  <td>
-                    <button className="edit-btn" onClick={() => handleEditUser(index)}>
-                     <EditNote/> Edit User
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-   </div>
-</div>
+      ) : (
+        <>
+          <button 
+            className="add-user-btn"
+            onClick={() => setShowForm(true)}
+          >
+            Add User
+          </button>
+          
+          <div className="users-list-container">
+            <h2 className="users-title">Users List</h2>
+            {users.length === 0 ? (
+              <p className="no-users-message">No users added yet</p>
+            ) : (
+              <table className="users-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Location</th>
+                    <th>Role</th>
+                    <th>Department</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map(user => (
+                    <tr key={user.id}>
+                      <td>{user.firstName} {user.lastName}</td>
+                      <td>{user.email}</td>
+                      <td>{user.phone}</td>
+                      <td>{user.location}</td>
+                      <td>{user.role}</td>
+                      <td>{user.department}</td>
+          
+                      <td>
+                        <button 
+                          className="edit-btn"
+                          onClick={() => handleEdit(user)}
+                        >
+                          Edit
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </>
+      )}
+    </div>
   );
-};
-
-export default Users;
+}
