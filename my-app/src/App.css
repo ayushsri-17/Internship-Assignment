@@ -11,6 +11,14 @@
   text-align: center;
 }
 
+.searchbar{
+  height: 40px;
+  width: 280px;
+  margin: 10px;
+  font-size: 18px;
+  padding: 10px;
+}
+
 .add-user-btn {
   background-color: #289b19;
   color: white;
