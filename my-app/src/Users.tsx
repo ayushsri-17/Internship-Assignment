@@ -115,7 +115,7 @@ const handleSearch = (type:string)=>{
               Edit</button>
                 </td>
                     <td>
-               <button className="edit-btn"onClick={() => handleDelete(user.id)}>
+               <button className="del-btn"onClick={() => handleDelete(user.id)}>
               Delete</button>
                 </td>
               </tr>
