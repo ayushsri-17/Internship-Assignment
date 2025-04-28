@@ -47,6 +47,11 @@ const handleSearch = (type:string)=>{
     setShowForm(true);
   };
 
+  const handleDelete = (toDelete: number) => {
+    setUsers(prevUsers => prevUsers.filter(user => user.id !== toDelete));
+  };
+  
+
   return (
     <div className="app-container">
       <h1 className="app-title">Manage Users</h1>
@@ -108,6 +113,10 @@ const handleSearch = (type:string)=>{
                     <td>
                <button className="edit-btn"onClick={() => handleEdit(user)}>
               Edit</button>
+                </td>
+                    <td>
+               <button className="edit-btn"onClick={() => handleDelete(user.id)}>
+              Delete</button>
                 </td>
               </tr>
               ))}
