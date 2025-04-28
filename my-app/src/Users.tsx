@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import UserForm from './UserForm';
 import { User } from './types';
 import './App.css';
@@ -10,6 +10,12 @@ export default function Users() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [searchUser, setSearchUser] = useState('');
   const [filteredUsers, setFilteredUser] = useState<User[]>(users);;
+
+  useEffect(() => {
+    if (searchUser.trim() === '') {
+      setFilteredUser(users);
+    }
+  }, [users, searchUser]);  
 
   const handleAddUser = (newUserData: Omit<User, 'id'>) => {
     if (editingUser) {
